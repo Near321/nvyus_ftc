@@ -131,10 +131,7 @@ public class LeTHIRDAvaJopMode extends OpMode
         }
 
 
-        capturing.setPower(reverse_capturing);
-
-
-        capturing.setPower(-capturing_power); //capturing power
+        capturing.setPower(reverse_capturing-capturing_power); //capturing power
 
 
         float capturingPower = (-capturing_power + reverse_capturing);
