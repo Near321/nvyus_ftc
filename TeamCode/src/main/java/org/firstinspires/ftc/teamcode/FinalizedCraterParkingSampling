@@ -89,8 +89,23 @@ public class FinalizedCraterParkingSampling extends LinearOpMode {
                     lift.setDirection(DcMotorSimple.Direction.FORWARD);
                     telemetry.addLine("going to the left");
                     //CenterCrab(1,2500);
-                    LeftDiagonal(0.3,3000);
-                    ArmUpAndShoot(1,2000);
+                    //LeftDiagonal(0.3,3000);
+                    back_leftDrive.setDirection(DcMotorSimple.Direction.REVERSE);
+                    leftDrive.setDirection(DcMotorSimple.Direction.FORWARD);
+                    rightDrive.setDirection(DcMotorSimple.Direction.FORWARD);
+                    back_rightDrive.setDirection(DcMotorSimple.Direction.REVERSE);
+                    leftDrive.setPower(1);
+                    rightDrive.setPower(1);
+                    back_leftDrive.setPower(1);
+                    back_rightDrive.setPower(1);
+                    sleep(300);
+                    leftDrive.setPower(0);
+                    rightDrive.setPower(0);
+                    back_leftDrive.setPower(0);
+                    back_rightDrive.setPower(0);
+                    LeftDiagonal(1,3000);
+                    //ArmUpOnly(0.5,500);
+                    //Extension(1,4000);
                     //BackMove(0.3,2000);
                     //maybe put these directions
                     /*CenterCrab(0.5,3000);
@@ -107,11 +122,11 @@ public class FinalizedCraterParkingSampling extends LinearOpMode {
                     leftDrive.setDirection(DcMotorSimple.Direction.FORWARD);
                     rightDrive.setDirection(DcMotorSimple.Direction.FORWARD);
                     back_rightDrive.setDirection(DcMotorSimple.Direction.REVERSE);
-                    leftDrive.setPower(1);
-                    rightDrive.setPower(1);
+                    leftDrive.setPower(0.97);
+                    rightDrive.setPower(0.97);
                     back_leftDrive.setPower(1);
                     back_rightDrive.setPower(1);
-                    sleep(2000);
+                    sleep(1100);
                     leftDrive.setPower(0);
                     rightDrive.setPower(0);
                     back_leftDrive.setPower(0);
@@ -126,9 +141,10 @@ public class FinalizedCraterParkingSampling extends LinearOpMode {
                     //lift.setDirection(DcMotorSimple.Direction.FORWARD);
                     //LiftDown(1,7000);
                     telemetry.addLine("going to the right");
-                    RightDiagonal(1,3000);
-                    CenterCrab(1,1000);
-                    ArmUpAndShoot(1,4000);
+                    RightDiagonal(1,3500); //or 3000
+                    //CenterCrab(1,1000);
+                    Spino(1,1000);
+                    //ArmUpOnly(0.5,4000);
                     break;
                 case UNKNOWN:
                     //lift.setDirection(DcMotorSimple.Direction.FORWARD);
@@ -142,9 +158,10 @@ public class FinalizedCraterParkingSampling extends LinearOpMode {
                     sleep(1000);
                     CenterCrab(1,2000); */
                     telemetry.addLine("going to the right");
-                    RightDiagonal(1,3000);
-                    CenterCrab(1,1000);
-                    ArmUpAndShoot(1,4000);
+                    RightDiagonal(1,3500); //or 3000
+                    //CenterCrab(1,1000);
+                    Spino(1,1000);
+                    //ArmUpOnly(0.5,4000);
                     break;
             }
 
@@ -197,8 +214,8 @@ public class FinalizedCraterParkingSampling extends LinearOpMode {
         lift.setDirection(DcMotorSimple.Direction.FORWARD);
         lift.setPower(1);
         rightDrive.setPower(power);
-        back_rightDrive.setPower(0.25);
-        leftDrive.setPower(0.25);
+        back_rightDrive.setPower(0.4);
+        leftDrive.setPower(0.4);
         back_leftDrive.setPower(power);
         sleep(time);
         rightDrive.setPower(0);
@@ -209,6 +226,22 @@ public class FinalizedCraterParkingSampling extends LinearOpMode {
     }
 
     public void LeftDiagonal(double power, long time) {
+        leftDrive.setDirection(DcMotor.Direction.FORWARD);
+        back_rightDrive.setDirection(DcMotorSimple.Direction.REVERSE);
+        back_leftDrive.setDirection(DcMotorSimple.Direction.REVERSE);
+        rightDrive.setDirection(DcMotorSimple.Direction.FORWARD);
+        rightDrive.setPower(0.3);
+        back_rightDrive.setPower(power);
+        leftDrive.setPower(power);
+        back_leftDrive.setPower(0.3);
+        sleep(time);
+        rightDrive.setPower(0);
+        back_rightDrive.setPower(0);
+        leftDrive.setPower(0);
+        back_leftDrive.setPower(0);
+        lift.setPower(0);
+
+        /*
         leftDrive.setDirection(DcMotor.Direction.REVERSE);
         back_rightDrive.setDirection(DcMotorSimple.Direction.FORWARD);
         back_leftDrive.setDirection(DcMotorSimple.Direction.REVERSE);
@@ -224,7 +257,7 @@ public class FinalizedCraterParkingSampling extends LinearOpMode {
         back_rightDrive.setPower(0);
         leftDrive.setPower(0);
         back_leftDrive.setPower(0);
-        lift.setPower(0);
+        lift.setPower(0); */
     }
 
     public void SlightLeft (double power, long time) {
@@ -316,6 +349,13 @@ public class FinalizedCraterParkingSampling extends LinearOpMode {
         arm2.setPower(0);
 
     }
+
+    public void Extension(double power, long time) {
+        extension.setPower(power);
+        sleep(time);
+        extension.setPower(0);
+    }
+
 
 
 
