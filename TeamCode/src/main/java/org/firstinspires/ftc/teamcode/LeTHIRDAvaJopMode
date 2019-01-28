@@ -105,8 +105,8 @@ public class LeTHIRDAvaJopMode extends OpMode
         //POWER SETTING
 
         leftPower        = Range.clip(drive + strafe + rotate, -0.5, 0.5) ;
-        rightPower       = Range.clip(drive - strafe - rotate, -0.5, 0.5) ;
-        backleftPower    = Range.clip(drive - strafe + rotate, -0.5, 0.5) ;
+        rightPower       = Range.clip(drive - strafe + rotate, -0.5, 0.5) ;
+        backleftPower    = Range.clip(drive - strafe - rotate, -0.5, 0.5) ;
         backrightPower   = Range.clip(drive + strafe - rotate, -0.5, 0.5) ;
 
         extension.setPower(-extensionPower/1.5);
@@ -152,9 +152,9 @@ public class LeTHIRDAvaJopMode extends OpMode
             arm.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
             arm.setPower(-1);
             arm2.setPower(1);
-            extension.setPower(1);
+            extension.setPower(0.8);
             try{
-                java.lang.Thread.sleep(3000);
+                java.lang.Thread.sleep(1500);
             }catch(InterruptedException ie){}
             arm.setPower(0);
             arm2.setPower(0);
@@ -238,8 +238,8 @@ public class LeTHIRDAvaJopMode extends OpMode
 
         // Send calculated power to wheels
         leftDrive.setPower(leftPower);
-        rightDrive.setPower(rightPower);
-        back_leftDrive.setPower(backleftPower);
+        rightDrive.setPower(-rightPower);
+        back_leftDrive.setPower(-backleftPower);
         back_rightDrive.setPower(-backrightPower);
 
         // Show the elapsed game time, wheel power, and capturing power
