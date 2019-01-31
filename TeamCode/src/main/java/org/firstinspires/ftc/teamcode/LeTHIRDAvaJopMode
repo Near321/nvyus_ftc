@@ -64,7 +64,7 @@ public class LeTHIRDAvaJopMode extends OpMode
         arm.setDirection(DcMotor.Direction.FORWARD);
 
         // Tell the driver that initialization is complete.
-        telemetry.addData("Le Status", "is very Initialization");
+        telemetry.addData( "Le Status", "is very Initialization");
     }
 
     @Override
@@ -104,10 +104,10 @@ public class LeTHIRDAvaJopMode extends OpMode
 
         //POWER SETTING
 
-        leftPower        = Range.clip(drive + strafe + rotate, -0.5, 0.5) ;
+        leftPower        = Range.clip(drive + strafe - rotate, -0.5, 0.5) ;
         rightPower       = Range.clip(drive - strafe + rotate, -0.5, 0.5) ;
         backleftPower    = Range.clip(drive - strafe - rotate, -0.5, 0.5) ;
-        backrightPower   = Range.clip(drive + strafe - rotate, -0.5, 0.5) ;
+        backrightPower   = Range.clip(drive + strafe + rotate, -0.5, 0.5) ;
 
         extension.setPower(-extensionPower/1.5);
 
@@ -237,10 +237,10 @@ public class LeTHIRDAvaJopMode extends OpMode
         */
 
         // Send calculated power to wheels
-        leftDrive.setPower(leftPower);
+        leftDrive.setPower(-leftPower);
         rightDrive.setPower(-rightPower);
         back_leftDrive.setPower(-backleftPower);
-        back_rightDrive.setPower(-backrightPower);
+        back_rightDrive.setPower(backrightPower);
 
         // Show the elapsed game time, wheel power, and capturing power
         telemetry.addData("Le StAtUs", "Le InitIaliZation TiMe: " + runtime.toString());
