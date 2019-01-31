@@ -65,9 +65,12 @@ public class NewFCPS extends LinearOpMode {
             leftDrive.setPower(0.3);
             back_leftDrive.setPower(0.3);
             lift.setPower(1);
-            sleep(10000);
+            //only testing this
+            sleep(8000);
             leftDrive.setPower(0);
             back_leftDrive.setPower(0);
+            sleep(2000);
+            leftDrive.setPower(0);
             lift.setPower(0);
             FrontMove(0.3,125);
             telemetry.addData("goldPosition was", goldPosition);// giving feedback
@@ -75,11 +78,12 @@ public class NewFCPS extends LinearOpMode {
                 case LEFT:
                     lift.setDirection(DcMotorSimple.Direction.FORWARD);
                     telemetry.addLine("going to the left");
-                    CenterCrab(1,250);
-                    FrontMove(0.3,250);
-                    CenterCrab(1,1000);
+                    CenterCrab(1,600);
+                    //CenterCrab(0.3,250);
+                    LeftDiagonal(0.5,4000);
+                    Spino(1,1000);
+                    BackwardCrab(0.5,500);
                     telemetry.addData("Center Crab","Called");
-
                     //ArmUpOnly(0.5,500);
                     //Extension(1,4000);
                     //BackMove(0.3,2000);
@@ -87,6 +91,11 @@ public class NewFCPS extends LinearOpMode {
                     /*CenterCrab(0.5,3000);
                     FrontMove(0.3,2000);
                     CenterCrab(0.5,3000);*/
+                    /*somewhat decent center code
+                    CenterCrab(1,250);
+                    FrontMove(0.3,250);
+                    CenterCrab(1,1000);
+                     */
                     break;
                 case CENTER:
                     //lift.setDirection(DcMotorSimple.Direction.FORWARD);
@@ -94,9 +103,13 @@ public class NewFCPS extends LinearOpMode {
                     //BackMove(0.3,500);
                     //maybe put these directions in the center crab module
                     //CenterCrab(1,3000)
-                    CenterCrab(1,250);
+                    CenterCrab(0.3,2000);
+                    BackMove(0.3,250);
+                    CenterCrab(1,1200);
+
+                    /*CenterCrab(1,250);
                     FrontMove(0.3,250);
-                    CenterCrab(1,1000);
+                    CenterCrab(1,1000);*/
                     telemetry.addData("Center Crab","Called");
                     /*rightDrive.setPower(0);
                     back_rightDrive.setPower(0);
@@ -107,9 +120,10 @@ public class NewFCPS extends LinearOpMode {
                     //lift.setDirection(DcMotorSimple.Direction.FORWARD);
                     //LiftDown(1,7000);
                     telemetry.addLine("going to the right");
+                    CenterCrab(1,500);
+                    BackMove(0.5,700);
                     RightDiagonal(1,3500); //or 30000
                     //CenterCrab(1,1000);
-                    Spino(1,1000);
                     //ArmUpOnly(0.5,4000);
                     break;
                 case UNKNOWN:
@@ -124,9 +138,10 @@ public class NewFCPS extends LinearOpMode {
                     sleep(1000);
                     CenterCrab(1,2000); */
                     telemetry.addLine("going to the right");
-                    RightDiagonal(1,3500); //or 3000
+                    CenterCrab(1,500);
+                    BackMove(0.5,700);
+                    RightDiagonal(1,3500); //or 30000
                     //CenterCrab(1,1000);
-                    Spino(1,1000);
                     //ArmUpOnly(0.5,4000);
                     break;
             }
@@ -172,7 +187,24 @@ public class NewFCPS extends LinearOpMode {
         back_rightDrive.setPower(0);
     }
 
+    public void BackwardCrab(double power, long time) {
+        back_leftDrive.setDirection(DcMotorSimple.Direction.REVERSE);
+        leftDrive.setDirection(DcMotorSimple.Direction.FORWARD);
+        rightDrive.setDirection(DcMotorSimple.Direction.FORWARD);
+        back_rightDrive.setDirection(DcMotorSimple.Direction.REVERSE);
+        leftDrive.setPower(power);
+        rightDrive.setPower(power);
+        back_leftDrive.setPower(power);
+        back_rightDrive.setPower(power);
+        sleep(time);
+        leftDrive.setPower(0);
+        rightDrive.setPower(0);
+        back_leftDrive.setPower(0);
+        back_rightDrive.setPower(0);
+    }
+
     public void RightDiagonal(double power, long time) {
+        /*agressive right
         leftDrive.setDirection(DcMotor.Direction.REVERSE);
         back_rightDrive.setDirection(DcMotorSimple.Direction.FORWARD);
         back_leftDrive.setDirection(DcMotorSimple.Direction.FORWARD);
@@ -189,13 +221,50 @@ public class NewFCPS extends LinearOpMode {
         leftDrive.setPower(0);
         back_leftDrive.setPower(0);
         lift.setPower(0);
+        */
+        ////// /////////// /////////// ////////// ///////////
+        /*not right enough
+        leftDrive.setDirection(DcMotor.Direction.REVERSE);
+        back_rightDrive.setDirection(DcMotorSimple.Direction.FORWARD);
+        back_leftDrive.setDirection(DcMotorSimple.Direction.FORWARD);
+        rightDrive.setDirection(DcMotorSimple.Direction.REVERSE);
+        lift.setDirection(DcMotorSimple.Direction.FORWARD);
+        lift.setPower(1);
+        rightDrive.setPower(power);
+        back_rightDrive.setPower(0.4);
+        leftDrive.setPower(0.4);
+        back_leftDrive.setPower(power);
+        sleep(time);
+        rightDrive.setPower(0);
+        back_rightDrive.setPower(0);
+        leftDrive.setPower(0);
+        back_leftDrive.setPower(0);
+        lift.setPower(0);
+        */
+        //just right?
+        leftDrive.setDirection(DcMotor.Direction.REVERSE);
+        back_rightDrive.setDirection(DcMotorSimple.Direction.FORWARD);
+        back_leftDrive.setDirection(DcMotorSimple.Direction.FORWARD);
+        rightDrive.setDirection(DcMotorSimple.Direction.REVERSE);
+        lift.setDirection(DcMotorSimple.Direction.FORWARD);
+        lift.setPower(1);
+        rightDrive.setPower(power);
+        back_rightDrive.setPower(0.33);
+        leftDrive.setPower(0.33);
+        back_leftDrive.setPower(power);
+        sleep(time);
+        rightDrive.setPower(0);
+        back_rightDrive.setPower(0);
+        leftDrive.setPower(0);
+        back_leftDrive.setPower(0);
+        lift.setPower(0);
     }
 
     public void LeftDiagonal(double power, long time) {
-        leftDrive.setDirection(DcMotor.Direction.FORWARD);
-        back_rightDrive.setDirection(DcMotorSimple.Direction.REVERSE);
-        back_leftDrive.setDirection(DcMotorSimple.Direction.REVERSE);
-        rightDrive.setDirection(DcMotorSimple.Direction.FORWARD);
+        leftDrive.setDirection(DcMotor.Direction.REVERSE);
+        back_rightDrive.setDirection(DcMotorSimple.Direction.FORWARD);
+        back_leftDrive.setDirection(DcMotorSimple.Direction.FORWARD);
+        rightDrive.setDirection(DcMotorSimple.Direction.REVERSE);
         rightDrive.setPower(0.3);
         back_rightDrive.setPower(power);
         leftDrive.setPower(power);
@@ -275,6 +344,22 @@ public class NewFCPS extends LinearOpMode {
     }
 
     public void Spino(double power, long time) {
+        leftDrive.setDirection(DcMotor.Direction.REVERSE);
+        back_rightDrive.setDirection(DcMotorSimple.Direction.REVERSE);
+        back_leftDrive.setDirection(DcMotorSimple.Direction.REVERSE);
+        rightDrive.setDirection(DcMotorSimple.Direction.REVERSE);
+        rightDrive.setPower(power);
+        back_rightDrive.setPower(power);
+        leftDrive.setPower(power);
+        back_leftDrive.setPower(power);
+        sleep(time);
+        rightDrive.setPower(0);
+        back_rightDrive.setPower(0);
+        leftDrive.setPower(0);
+        back_leftDrive.setPower(0);
+    }
+
+    public void CounterClockSpino(double power, long time) {
         leftDrive.setDirection(DcMotor.Direction.FORWARD);
         back_rightDrive.setDirection(DcMotorSimple.Direction.FORWARD);
         back_leftDrive.setDirection(DcMotorSimple.Direction.FORWARD);
@@ -289,6 +374,7 @@ public class NewFCPS extends LinearOpMode {
         leftDrive.setPower(0);
         back_leftDrive.setPower(0);
     }
+
 
     public void ArmUpAndShoot(double power, long time) {
         arm.setDirection(DcMotor.Direction.FORWARD);
