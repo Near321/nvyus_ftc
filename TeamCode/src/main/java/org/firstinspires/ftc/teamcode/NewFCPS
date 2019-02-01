@@ -82,7 +82,7 @@ public class NewFCPS extends LinearOpMode {
                     //CenterCrab(0.3,250);
                     LeftDiagonal(0.5,4000);
                     Spino(1,1000);
-                    BackwardCrab(0.5,500);
+                    BackwardCrab(0.5,1000);
                     telemetry.addData("Center Crab","Called");
                     //ArmUpOnly(0.5,500);
                     //Extension(1,4000);
@@ -104,7 +104,8 @@ public class NewFCPS extends LinearOpMode {
                     //maybe put these directions in the center crab module
                     //CenterCrab(1,3000)
                     CenterCrab(0.3,2000);
-                    BackMove(0.3,250);
+                    //BackMove(0.3,250);
+                    BackMove(0.3,300);
                     CenterCrab(1,1200);
 
                     /*CenterCrab(1,250);
