@@ -93,6 +93,7 @@ public class LeTHIRDAvaJopMode extends OpMode
         double armPower = gamepad2.left_stick_y; //arm extender
         float capturing_power = gamepad2.left_trigger; //left trigger for capturing power
         float reverse_capturing = gamepad2.right_trigger; //right trigger to reverse capturing
+        double extensionPower = gamepad2.right_stick_y;
 
         double drive  = -gamepad1.left_stick_y; //up and down values
         double strafe =  gamepad1.left_stick_x; //side to side values
@@ -109,8 +110,10 @@ public class LeTHIRDAvaJopMode extends OpMode
         backleftPower    = Range.clip(drive - strafe - rotate, -0.5, 0.5) ;
         backrightPower   = Range.clip(drive + strafe + rotate, -0.5, 0.5) ;
 
-        arm.setPower(-armPower);
-        arm2.setPower(armPower);
+        arm.setPower(armPower);
+        arm2.setPower(-armPower);
+        extension.setPower(-extensionPower/1.5);
+
 
         //stupid and inefficient if statements
 
@@ -182,6 +185,7 @@ public class LeTHIRDAvaJopMode extends OpMode
             // ARM
 
         }
+        /**
         if (button_up == true) {
             extension.setPower(1);
 
@@ -207,6 +211,7 @@ public class LeTHIRDAvaJopMode extends OpMode
             extension.setPower(0);
 
         }
+        */
         /**
          * grip
 
