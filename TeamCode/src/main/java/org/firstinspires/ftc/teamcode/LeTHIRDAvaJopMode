@@ -90,7 +90,7 @@ public class LeTHIRDAvaJopMode extends OpMode
         float extension_slow = gamepad2.left_trigger; //slows down arm extension
         boolean arm_preset_up = gamepad2.dpad_up; //press dpad up to do arm preset up
         boolean arm_preset_down = gamepad2.dpad_down; //press dpad down to do arm preset down
-        double extensionPower = gamepad2.left_stick_y; //arm extender
+        double armPower = gamepad2.left_stick_y; //arm extender
         float capturing_power = gamepad2.left_trigger; //left trigger for capturing power
         float reverse_capturing = gamepad2.right_trigger; //right trigger to reverse capturing
 
@@ -109,7 +109,8 @@ public class LeTHIRDAvaJopMode extends OpMode
         backleftPower    = Range.clip(drive - strafe - rotate, -0.5, 0.5) ;
         backrightPower   = Range.clip(drive + strafe + rotate, -0.5, 0.5) ;
 
-        extension.setPower(-extensionPower/1.5);
+        arm.setPower(-armPower);
+        arm2.setPower(armPower);
 
         //stupid and inefficient if statements
 
@@ -198,8 +199,7 @@ public class LeTHIRDAvaJopMode extends OpMode
 
         }
         if (button_up == true) {
-            arm.setPower(1);
-            arm2.setPower(-1);
+            extension.setPower(1);
 
             //try and catch code
             try{
@@ -208,12 +208,11 @@ public class LeTHIRDAvaJopMode extends OpMode
 
             }
             //end of try and catch code
-            arm.setPower(0);
-            arm2.setPower(0);
+            extension.setPower(0);
         }
         if (button_down == true) {
-            arm.setPower(-1);
-            arm2.setPower(1);
+            extension.setPower(-1);
+
             //try and catch code
             try{
                 java.lang.Thread.sleep(time);
@@ -221,8 +220,8 @@ public class LeTHIRDAvaJopMode extends OpMode
 
             }
             //end of try and catch code
-            arm.setPower(0);
-            arm2.setPower(0);
+            extension.setPower(0);
+
         }
         /**
          * grip
