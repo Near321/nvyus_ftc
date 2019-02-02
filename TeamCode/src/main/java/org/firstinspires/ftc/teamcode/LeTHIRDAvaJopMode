@@ -149,28 +149,12 @@ public class LeTHIRDAvaJopMode extends OpMode
         //ARM PRESET UP
 
         if(arm_preset_up == true){
-            extension.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-            arm.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-            arm.setPower(-1);
-            arm2.setPower(1);
-            extension.setPower(0.8);
-            try{
-                java.lang.Thread.sleep(1500);
-            }catch(InterruptedException ie){}
-            arm.setPower(0);
-            arm2.setPower(0);
+            telemetry.addData("Eddie"," is a thot");
         }
         //ARM PRESET DOWN
 
         if(arm_preset_down == true){
-            arm.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-            arm.setPower(1);
-            arm2.setPower(-1);
-            try{
-                java.lang.Thread.sleep(400);
-            }catch(InterruptedException ie){}
-            arm.setPower(0);
-            arm2.setPower(0);
+            telemetry.addData("Gained"," Down Syndrome!");
         }
         //LIFT
 
