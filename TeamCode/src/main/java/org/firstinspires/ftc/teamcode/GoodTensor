@@ -1,0 +1,320 @@
+package org.firstinspires.ftc.teamcode;
+
+import android.drm.DrmStore;
+
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotor;
+
+import java.util.List;
+import org.firstinspires.ftc.robotcore.external.ClassFactory;
+import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
+import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer.CameraDirection;
+import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
+import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
+import org.firstinspires.ftc.robotcore.external.tfod.TfodSkyStone;
+
+/* steps
+1. Detect if it's right in front of a skystone, and move straightforward if so
+2. if not in front of skystone, move at 0.3 speed and only stop once skystone deteced, but x = 0; this will center it
+3. center crab
+ */
+
+@TeleOp(name = "GoodTensor", group = "Autonomous")
+public class GoodTensor extends LinearOpMode {
+
+    //drives
+    private DcMotor leftDrive = null;
+    private DcMotor rightDrive = null;
+    private DcMotor back_leftDrive = null;
+    private DcMotor back_rightDrive = null;
+
+
+    private static final String TFOD_MODEL_ASSET = "Skystone.tflite";
+    private static final String LABEL_FIRST_ELEMENT = "Stone";
+    private static final String LABEL_SECOND_ELEMENT = "Skystone";
+
+    private static final String VUFORIA_KEY =
+            "AR17cRr/////AAABmVQdKnZK30kikwF9DjAY7NYj1UW9723C6HMxZjlHm1Y5hTAlU545LLaH/n/rrf1Z1n+H61NjlA5bAOqBfdODHUtvo5vTUNv/yd5v8gw8Am7UXp41c38KOL5ALU5O1G5wsCEYWPcZ7Rd4qTlMj0Eq6kGRUqb3MIlg65SgaGk1z/ZMlprsrI8fiuy3JM6JrvNaK0u3DhnnHnNdWNt0mMcnU3GvFGZCHuktirstOKnzq6baC1XknNzFSmV/hWP+5pPsyZB4PIXGZ1EoSkr7y5mw7W3X5/5Vu1BcgxQLp3j7HZfH4Pej1UfgAeDzCE9pb06UOnO5eYUWyfti/89w5tXVV++V89t+6PAs5qlYPiFsBmhr";
+
+    /**
+     * {@link #vuforia} is the variable we will use to store our instance of the Vuforia
+     * localization engine.
+     */
+    private VuforiaLocalizer vuforia;
+
+    /**
+     * {@link #tfod} is the variable we will use to store our instance of the TensorFlow Object
+     * Detection engine.
+     */
+    private TFObjectDetector tfod;
+
+    @Override
+    public void runOpMode() {
+        //drives
+        leftDrive = hardwareMap.get(DcMotor.class, "left_drive");
+        rightDrive = hardwareMap.get(DcMotor.class, "right_drive");
+        back_leftDrive  = hardwareMap.get(DcMotor.class, "back_left_drive");
+        back_rightDrive = hardwareMap.get(DcMotor.class, "back_right_drive");
+
+        leftDrive.setDirection(DcMotor.Direction.FORWARD);
+        back_rightDrive.setDirection(DcMotor.Direction.REVERSE);
+        back_leftDrive.setDirection(DcMotor.Direction.FORWARD);
+        rightDrive.setDirection(DcMotor.Direction.REVERSE);
+        double center_threshold = 1000.0;  // minimum x pixels to center robot
+        float vertical_threshold = 1200;
+
+        // The TFObjectDetector uses the camera frames from the VuforiaLocalizer, so we create that
+        // first.
+        initVuforia();
+
+        if (ClassFactory.getInstance().canCreateTFObjectDetector()) {
+            initTfod();
+        } else {
+            telemetry.addData("Sorry!", "This device is not compatible with TFOD");
+        }
+
+        /**
+         * Activate TensorFlow Object Detection before we wait for the start command.
+         * Do it here so that the Camera Stream window will have the TensorFlow annotations visible.
+         **/
+        if (tfod != null) {
+            tfod.activate();
+        }
+
+        /** Wait for the game to begin */
+        telemetry.addData(">", "Press Play to start op mode");
+        telemetry.update();
+        waitForStart();
+
+        if (opModeIsActive()) {
+            while (opModeIsActive()) {
+                //detect object but only stop once you get all the way aligned
+                if (tfod != null) {
+                    List<Recognition> updatedRecognitions = tfod.getUpdatedRecognitions();
+                    if (updatedRecognitions != null) {
+                        telemetry.addData("# Object Detected", updatedRecognitions.size());
+
+                        // step through the list of recognitions and display boundary info.
+                        int i = 0;
+                        for (Recognition recognition : updatedRecognitions) {
+                            telemetry.addData(String.format("label (%d)", i), recognition.getLabel());
+                            telemetry.addData(String.format("  left,top (%d)", i), "%.03f , %.03f",
+                                    recognition.getLeft(), recognition.getTop());
+                            telemetry.addData(String.format("  right,bottom (%d)", i), "%.03f , %.03f",
+                                    recognition.getRight(), recognition.getBottom());
+                            telemetry.update();
+
+                            if (recognition.getLabel() != "Skystone") {
+                                //don't forget to telemetry.update!
+                                double power = 0.1;
+                                rightDrive.setPower(power);
+                                back_rightDrive.setPower(power);
+                                leftDrive.setPower(power);
+                                back_leftDrive.setPower(power);
+                                if (java.lang.Math.abs(recognition.getLeft()) <= center_threshold) {
+                                    telemetry.addData("Status", "Spotted Skystone");
+                                    telemetry.addData("Status", "X = 0");
+                                    rightDrive.setPower(0);
+                                    back_rightDrive.setPower(0);
+                                    leftDrive.setPower(0);
+                                    back_leftDrive.setPower(0);
+                                    telemetry.update();
+                                    LeftCrabEncoder(0.3);
+                                    if (java.lang.Math.abs(recognition.getTop() - recognition.getBottom()) == vertical_threshold) {
+                                        StopAndForward(0);
+                                    }
+
+                                }
+                                telemetry.addData("Status","No Skystone Detected");
+                                telemetry.addData("Power:",power);
+                                telemetry.update();
+                            }
+
+                            if (recognition.getLabel() == "Skystone" && java.lang.Math.abs(recognition.getLeft()) <= center_threshold) { //make sure to add "and x = 0"
+                                telemetry.addData("Status", "Spotted Skystone");
+                                telemetry.addData("Status", "X = 0");
+                                rightDrive.setPower(0);
+                                back_rightDrive.setPower(0);
+                                leftDrive.setPower(0);
+                                back_leftDrive.setPower(0);
+                                //make sure camera pixels adjusted based on camera resolution of phone
+
+
+                                //if (recognition.getRight() = &&) {
+                                //}
+                                //Crab here//
+                                //ticks from distance calculated by ratio
+                                telemetry.update();
+                                LeftCrabEncoder(0.3);
+                                if (java.lang.Math.abs(recognition.getTop() - recognition.getBottom()) == vertical_threshold) {
+                                    StopAndForward(0);
+                                }
+                                //  StopAndForward(0);
+
+                            }
+
+
+
+
+
+
+
+
+
+                        }
+                        // getUpdatedRecognitions() will return null if no new information is available since
+                        // the last time that call was made.
+
+
+                    }
+                    //CenterCrabEncoder(1960, 2000);
+                    /*
+                    else {
+                        telemetry.addData("N/A","Objects at all");
+                        telemetry.update();
+                        rightDrive.setPower(0.3);
+                        back_rightDrive.setPower(0.3);
+                        leftDrive.setPower(0.3);
+                        back_leftDrive.setPower(0.3);
+                    }
+                    */
+
+                }
+            }
+        }
+
+        if (tfod != null) {
+            tfod.shutdown();
+        }
+    }
+    public void LeftCrabEncoder(double power) {
+        back_leftDrive.setDirection(DcMotor.Direction.FORWARD);
+        leftDrive.setDirection(DcMotor.Direction.REVERSE);
+        rightDrive.setDirection(DcMotor.Direction.REVERSE);
+        back_rightDrive.setDirection(DcMotor.Direction.FORWARD);
+        leftDrive.setPower(power);
+        rightDrive.setPower(power);
+        back_leftDrive.setPower(power);
+        back_rightDrive.setPower(power);
+
+    }
+    public void StopAndForward (double power){
+        leftDrive.setDirection(DcMotor.Direction.FORWARD);
+        back_rightDrive.setDirection(DcMotor.Direction.REVERSE);
+        back_leftDrive.setDirection(DcMotor.Direction.FORWARD);
+        rightDrive.setDirection(DcMotor.Direction.REVERSE);
+        leftDrive.setPower(power);
+        rightDrive.setPower(power);
+        back_leftDrive.setPower(power);
+        back_rightDrive.setPower(power);
+    }
+
+
+    /*
+    public void FrontMove(double power, long time) {
+        leftDrive.setDirection(DcMotor.Direction.REVERSE);
+        back_rightDrive.setDirection(DcMotor.Direction.FORWARD);
+        back_leftDrive.setDirection(DcMotor.Direction.REVERSE);
+        rightDrive.setDirection(DcMotor.Direction.FORWARD);
+        rightDrive.setPower(power);
+        back_rightDrive.setPower(power);
+        leftDrive.setPower(power);
+        back_leftDrive.setPower(power);
+        sleep(time);
+        rightDrive.setPower(0);
+        back_rightDrive.setPower(0);
+        leftDrive.setPower(0);
+        back_leftDrive.setPower(0);
+    }
+
+    public void BackMove(double power, long time) {
+        leftDrive.setDirection(DcMotor.Direction.FORWARD);
+        back_rightDrive.setDirection(DcMotor.Direction.REVERSE);
+        back_leftDrive.setDirection(DcMotor.Direction.FORWARD);
+        rightDrive.setDirection(DcMotor.Direction.REVERSE);
+        rightDrive.setPower(power);
+        back_rightDrive.setPower(power);
+        leftDrive.setPower(power);
+        back_leftDrive.setPower(power);
+        sleep(time);
+        rightDrive.setPower(0);
+        back_rightDrive.setPower(0);
+        leftDrive.setPower(0);
+        back_leftDrive.setPower(0);
+    }
+
+    //make sure this is by encoders
+    //make an opmode just to test drives
+    public void CenterCrabEncoder(int position, double power) {
+        back_leftDrive.setDirection(DcMotor.Direction.FORWARD);
+        leftDrive.setDirection(DcMotor.Direction.REVERSE);
+        rightDrive.setDirection(DcMotor.Direction.REVERSE);
+        back_rightDrive.setDirection(DcMotor.Direction.FORWARD);
+        //set position
+        leftDrive.setTargetPosition(position);
+        rightDrive.setTargetPosition(position);
+        back_leftDrive.setTargetPosition(position);
+        back_rightDrive.setTargetPosition(position);
+        //set power
+        leftDrive.setPower(power);
+        rightDrive.setPower(power);
+        back_leftDrive.setPower(power);
+        back_rightDrive.setPower(power);
+        //motors should automatically turn off
+        leftDrive.setPower(0);
+        rightDrive.setPower(0);
+        back_leftDrive.setPower(0);
+        back_rightDrive.setPower(0);
+
+    }
+    //must be encoders
+    public void BackwardCrab(double power, long time) {
+        back_leftDrive.setDirection(DcMotor.Direction.REVERSE);
+        leftDrive.setDirection(DcMotor.Direction.FORWARD);
+        rightDrive.setDirection(DcMotor.Direction.FORWARD);
+        back_rightDrive.setDirection(DcMotor.Direction.REVERSE);
+        leftDrive.setPower(power);
+        rightDrive.setPower(power);
+        back_leftDrive.setPower(power);
+        back_rightDrive.setPower(power);
+        sleep(time);
+        leftDrive.setPower(0);
+        rightDrive.setPower(0);
+        back_leftDrive.setPower(0);
+        back_rightDrive.setPower(0);
+    }
+    */
+
+
+    /**
+     * Initialize the Vuforia localization engine.
+     */
+    private void initVuforia() {
+        /*
+         * Configure Vuforia by creating a Parameter object, and passing it to the Vuforia engine.
+         */
+        VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters();
+
+        parameters.vuforiaLicenseKey = VUFORIA_KEY;
+        parameters.cameraDirection = CameraDirection.BACK;
+
+        //  Instantiate the Vuforia engine
+        vuforia = ClassFactory.getInstance().createVuforia(parameters);
+
+        // Loading trackables is not necessary for the TensorFlow Object Detection engine.
+    }
+
+    /**
+     * Initialize the TensorFlow Object Detection engine.
+     */
+    private void initTfod() {
+        int tfodMonitorViewId = hardwareMap.appContext.getResources().getIdentifier(
+                "tfodMonitorViewId", "id", hardwareMap.appContext.getPackageName());
+        TFObjectDetector.Parameters tfodParameters = new TFObjectDetector.Parameters(tfodMonitorViewId);
+        tfodParameters.minimumConfidence = 0.8;
+        tfod = ClassFactory.getInstance().createTFObjectDetector(tfodParameters, vuforia);
+        tfod.loadModelFromAsset(TFOD_MODEL_ASSET, LABEL_FIRST_ELEMENT, LABEL_SECOND_ELEMENT);
+    }
+}
