@@ -1,0 +1,271 @@
+package org.firstinspires.ftc.teamcode;
+
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorController;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.hardware.NormalizedRGBA;
+import com.qualcomm.robotcore.hardware.NormalizedColorSensor;
+
+@Autonomous(name="FoundationOPModeRED", group="Autonomous")
+public class FoundationOpModeRED extends LinearOpMode {
+    DcMotor leftDrive;
+    DcMotor rightDrive;
+    DcMotor back_leftDrive;
+    DcMotor back_rightDrive;
+    Servo dad_right;
+    Servo dad_left;
+    NormalizedColorSensor color_sensor;
+
+
+    @Override
+    public void runOpMode() throws InterruptedException {
+
+        leftDrive = hardwareMap.dcMotor.get("left_drive");
+        rightDrive = hardwareMap.dcMotor.get("right_drive");
+        back_leftDrive = hardwareMap.dcMotor.get("back_left_drive");
+        back_rightDrive = hardwareMap.dcMotor.get("back_right_drive");
+        dad_right = hardwareMap.servo.get("dad_right");
+        dad_left = hardwareMap.servo.get("dad_left");
+        color_sensor = hardwareMap.get(NormalizedColorSensor.class, "sensor_color");
+
+        // NormalizedRGBA colors = color_sensor.getNormalizedColors();
+
+        // reset encoder count kept by left motor.
+
+
+        //just got rid of that to see have will happen, make sure to pay attention to this in the future!!!!
+        leftDrive.setDirection((DcMotor.Direction.FORWARD));
+        rightDrive.setDirection((DcMotor.Direction.REVERSE));
+        back_leftDrive.setDirection((DcMotor.Direction.FORWARD));
+        back_rightDrive.setDirection((DcMotor.Direction.REVERSE));
+
+
+        telemetry.addData("Mode", "waiting");
+        telemetry.update();
+
+
+        // wait for start button.
+
+        waitForStart();
+
+        // set left motor to run to target encoder position and stop with brakes on.
+
+        //!! always set target position before setting run to position!
+        //That is for encoders
+        /*leftDrive.setTargetPosition(0);
+        rightDrive.setTargetPosition(0);
+        back_leftDrive.setTargetPosition(0);
+        back_rightDrive.setTargetPosition(0);
+
+        leftDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        rightDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        back_leftDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        back_rightDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+*/
+        /*leftDrive.setPower(0.2);
+        rightDrive.setPower(0.2);
+        back_leftDrive.setPower(0.2);
+        back_rightDrive.setPower(0.2);
+*/
+        // set right motor to run without regard to an encoder.
+
+        telemetry.addData("Mode", "running");
+        telemetry.update();
+
+
+
+        // set left motor to run for 5000 encoder counts.
+        // 1 rotations is 1120 ticks so mutiply 4pi and the number of rotation u have at that should
+        // come out to be how many inches it will be. So find the number of rotations mutiply it with 1120
+        // this is for one foot(1068)
+        // (12 * (1120 / (4pi) )) = 1068
+        // set both motors to 25% power. Movement will start.
+
+        //double power_ratio = 0.5;
+        //you might want to make left negative later
+        // wait while opmode is active and left xmotor is busy running to position.
+
+        //all public void drive code is here!
+        MoveBack(0.3, 1900);//1900
+        sleep(2000);
+        dad_right(1);
+        sleep(1000);
+        dad_left(1);
+        sleep(1000);
+        MoveForward(0.3, 1900);//1900
+        sleep(1000);
+        dad_right(0);
+        sleep(1000);
+        dad_left(0);
+        sleep(1000);
+        /*LeftCrab(1, 1300);
+        sleep(1000);
+        MoveBack(0.3, 900);//900
+        sleep(1000);
+        RightCrab(1, 800);
+       */
+        LeftCrabWithColorSensor(0.6, 2000);
+
+        while (opModeIsActive()) {
+
+            NormalizedRGBA colors = color_sensor.getNormalizedColors();
+
+            telemetry.addData("encoder-fwd", leftDrive.getCurrentPosition() + "  busy=" + leftDrive.isBusy());
+            telemetry.update();
+            sleep(1000);
+            telemetry.addData("R", "%.3f; G%.3f; B%.3f", colors.red, colors.green, colors.blue);
+
+            //idle();
+        }
+    }
+
+    public void RightCrab(double power, long time) {
+        leftDrive.setDirection((DcMotor.Direction.FORWARD));
+        rightDrive.setDirection((DcMotor.Direction.FORWARD));
+        back_leftDrive.setDirection((DcMotor.Direction.REVERSE));
+        back_rightDrive.setDirection((DcMotor.Direction.REVERSE));
+
+        leftDrive.setPower(power);
+        rightDrive.setPower(power);
+        back_leftDrive.setPower(power);
+        back_rightDrive.setPower(power);
+
+        sleep(time);
+
+        leftDrive.setPower(0);
+        rightDrive.setPower(0);
+        back_leftDrive.setPower(0);
+        back_rightDrive.setPower(0);
+
+    }
+
+    public void MoveBack(double power, long time) {
+        leftDrive.setDirection((DcMotor.Direction.FORWARD));
+        rightDrive.setDirection((DcMotor.Direction.REVERSE));
+        back_leftDrive.setDirection((DcMotor.Direction.FORWARD));
+        back_rightDrive.setDirection((DcMotor.Direction.REVERSE));
+
+
+        leftDrive.setPower(power);
+        rightDrive.setPower(power);
+        back_leftDrive.setPower(power);
+        back_rightDrive.setPower(power);
+
+        sleep(time);
+
+        leftDrive.setPower(0);
+        rightDrive.setPower(0);
+        back_leftDrive.setPower(0);
+        back_rightDrive.setPower(0);
+
+    }
+
+    public void MoveForward(double power, long time) {
+        leftDrive.setDirection((DcMotor.Direction.REVERSE));
+        rightDrive.setDirection((DcMotor.Direction.FORWARD));
+        back_leftDrive.setDirection((DcMotor.Direction.REVERSE));
+        back_rightDrive.setDirection((DcMotor.Direction.FORWARD));
+
+        leftDrive.setPower(power);
+        rightDrive.setPower(power);
+        back_leftDrive.setPower(power);
+        back_rightDrive.setPower(power);
+
+        sleep(time);
+
+        leftDrive.setPower(0);
+        rightDrive.setPower(0);
+        back_leftDrive.setPower(0);
+        back_rightDrive.setPower(0);
+
+    }
+
+    public void LeftCrab(double power, long time) {
+        leftDrive.setDirection((DcMotor.Direction.REVERSE));
+        rightDrive.setDirection((DcMotor.Direction.REVERSE));
+        back_leftDrive.setDirection((DcMotor.Direction.FORWARD));
+        back_rightDrive.setDirection((DcMotor.Direction.FORWARD));
+
+        leftDrive.setPower(power);
+        rightDrive.setPower(power);
+        back_leftDrive.setPower(power);
+        back_rightDrive.setPower(power);
+
+        sleep(time);
+
+        leftDrive.setPower(0);
+        rightDrive.setPower(0);
+        back_leftDrive.setPower(0);
+        back_rightDrive.setPower(0);
+
+    }
+
+
+
+    public void dad_right(double position) {
+
+        dad_right.setDirection((Servo.Direction.FORWARD));
+
+        //double servoPosition = 0.0;
+
+        dad_right.setPosition(position);
+
+        // dad_right.setPosition(0);
+
+    }
+    public void dad_left(double position) {
+
+        dad_left.setDirection((Servo.Direction.FORWARD));
+
+        //double servoPosition = 0.0;
+
+
+        dad_left.setPosition(position);
+
+        //dad_left.setPosition(0);
+
+    }
+
+    public void LeftCrabWithColorSensor (double power, long time)
+    {
+
+        NormalizedRGBA colors = color_sensor.getNormalizedColors();
+
+        telemetry.addData("R", "%.3f; G%.3f; B%.3f", colors.red, colors.green, colors.blue);
+        telemetry.update();
+
+        leftDrive.setDirection((DcMotor.Direction.REVERSE));
+        rightDrive.setDirection((DcMotor.Direction.REVERSE));
+        back_leftDrive.setDirection((DcMotor.Direction.FORWARD));
+        back_rightDrive.setDirection((DcMotor.Direction.FORWARD));
+
+
+        leftDrive.setPower(power);
+        rightDrive.setPower(power);
+        back_leftDrive.setPower(power - 0.15);
+        back_rightDrive.setPower(power - 0.15);
+
+        long counter = 0;
+        long waitInterval = 5;
+        long maxCounter = time/waitInterval;
+        while ((colors.red < 0.112) || counter < maxCounter) {
+            telemetry.addData("R", "%.3f; G%.3f; B%.3f", colors.red, colors.green, colors.blue);
+            telemetry.update();
+            sleep(waitInterval);
+            // keep reading the current color
+            colors = color_sensor.getNormalizedColors();
+            counter++;
+
+        }
+        //if (colors.red > 0.17) {
+            leftDrive.setPower(0);
+            rightDrive.setPower(0);
+            back_leftDrive.setPower(0);
+            back_rightDrive.setPower(0);
+        //}
+    }
+
+}
